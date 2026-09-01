@@ -1,0 +1,42 @@
+services:
+  api:
+    build:
+      context: ./backend
+      args:
+        PLAYWRIGHT_VERSION: "1.49.1"
+    env_file:
+      - path: ./backend/.env
+        required: false
+    ports:
+      - "8000:8000"
+    shm_size: 2gb
+    ipc: host
+    security_opt:
+      - seccomp=./infra/seccomp-chrome.json
+    mem_limit: 3g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  web:
+    build:
+      context: ./frontend
+      target: dev
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    ports:
+      - "5173:5173"
+    depends_on:
+      api:
+        condition: service_healthy
+    profiles: ["full"]
+
+  fixtures:
+    image: python:3.12-alpine
+    working_dir: /fixtures
+    volumes:
+      - ./backend/tests/fixtures/sites:/fixtures:ro
+    command: python -m http.server 9000
+    profiles: ["test"]
