@@ -4,6 +4,11 @@
 # Build context is the REPO ROOT (both frontend/ and backend/ are needed).
 # backend/Dockerfile is left untouched so local docker-compose keeps working.
 
+# Declared before the first FROM so it is a GLOBAL build arg. An ARG declared
+# after a FROM is scoped to that stage and is NOT visible to later FROM lines,
+# which silently expands the tag to "v-noble" and fails to resolve.
+ARG PLAYWRIGHT_VERSION=1.49.1
+
 # ---------------------------------------------------------------- stage 1: UI
 FROM node:20-alpine AS web
 WORKDIR /web
@@ -16,7 +21,6 @@ ENV VITE_API_URL=""
 RUN npm run build
 
 # ------------------------------------------------------------- stage 2: API
-ARG PLAYWRIGHT_VERSION=1.49.1
 FROM mcr.microsoft.com/playwright/python:v${PLAYWRIGHT_VERSION}-noble
 
 WORKDIR /app
