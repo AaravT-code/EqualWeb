@@ -1,8 +1,0 @@
-**/.env
-infra/seccomp-chrome.json
-node_modules/
-__pycache__/
-.pytest_cache/
-dist/
-.DS_Store
-Docker.dmg
