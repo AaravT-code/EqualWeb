@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: accessibility-auditor-api
-    env: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
-    plan: standard
-    autoDeploy: false
